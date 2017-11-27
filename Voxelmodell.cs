@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -44,46 +44,42 @@ namespace Werkzeugbahnplanung
             for (int i = 0; i < randBreite - 1; i++)
             {
                 //Die Verwendung einer foreach Schleife ist hier nicht möglich, da die Koodidaten des zu betrachtenden Voxels benötigt werden.
-                for (int x = 0; x < m_Boundingbox_x; x++)
+                foreach (Voxel voxel in m_Voxelmatrix)
                 {
-                    for (int y = 0; y < m_Boundingbox_y; y++)
+                    ushort x = voxel.getKoords()[0];
+                    ushort y = voxel.getKoords()[1];
+                    ushort z = voxel.getKoords()[2];
+                    /*Es sind nur Voxel relevant, die zum Rand gehören.
+                    Leere Voxel müssen vorher aussortiert werden, weil wir nicht auf Attribute leerer Objekte zugreifen können.
+                    Die zweite Bedingung wird nicht ausgeführt, wenn die erste nicht erfüllt ist -> Fehlervermeidung*/
+                    if (voxel != null && voxel.getModellrand() == true)
                     {
-                        for (int z = 0; z < m_Boundingbox_z; z++)
+                        /*Jeder Voxel hat 6, 18 oder 26 Nachbarn, je nach dem ob man Nachbarschaften über Flächen, Kanten und/oder Ecken als Nachbarschaft ansieht.
+                         Die Programmierung ist auf 26 ausgelegt.
+                         Bei jedem möglichen Nachbar ist zu prüfen, ob dieser im Modell liegt(nicht out of range) und existiert (nicht null)
+                         Die Prüfung wurde in eine neue Methode ausgelagert. Sie wird mit allen Voxeln aufgerunfen, bei denen sich jede Koodinate, um max 1 unterscheiden.*/
+                        for (int x_div = -1; x_div <= 1; x_div++)
                         {
-                            Voxel voxel = m_Voxelmatrix[x, y, z];
-                            /*Es sind nur Voxel relevant, die zum Rand gehören.
-                            Leere Voxel müssen vorher aussortiert werden, weil wir nicht auf Attribute leerer Objekte zugreifen können.
-                            Die zweite Bedingung wird nicht ausgeführt, wenn die erste nicht erfüllt ist -> Fehlervermeidung*/
-                            if (voxel != null && voxel.getModellrand() == true)
+                            for (int y_div = -1; y_div <= 1; y_div++)
                             {
-                                /*Jeder Voxel hat 6, 18 oder 26 Nachbarn, je nach dem ob man Nachbarschaften über Flächen, Kanten und/oder Ecken als Nachbarschaft ansieht.
-                                 Die Programmierung ist auf 26 ausgelegt.
-                                 Bei jedem möglichen Nachbar ist zu prüfen, ob dieser im Modell liegt(nicht out of range) und existiert (nicht null)
-                                 Die Prüfung wurde in eine neue Methode ausgelagert. Sie wird mit allen Voxeln aufgerunfen, bei denen sich jede Koodinate, um max 1 unterscheiden.*/
-                                for (int x_div = -1; x_div <= 1; x_div++)
+                                for (int z_div = -1; z_div <= 1; z_div++)
                                 {
-                                    for (int y_div = -1; y_div <= 1; y_div++)
+                                    if (pruefeVoxelAufVerbreiterung(x + x_div, y + y_div, z + z_div))
                                     {
-                                        for (int z_div = -1; z_div <= 1; z_div++)
-                                        {
-                                            if (pruefeVoxelAufVerbreiterung(x + x_div, y + y_div, z + z_div))
-                                            {
-                                                int[] pos = { x + x_div, y + y_div, z + z_div };
-                                                positionenHinzufügenderVoxel.Add(pos);
-                                            }
-                                        }
+                                        int[] pos = { x + x_div, y + y_div, z + z_div };
+                                        positionenHinzufügenderVoxel.Add(pos);
                                     }
                                 }
                             }
                         }
                     }
+                    //Damit das Verändern von Voxeln sich erst auf die nächste Iteration auswirkt, dürfen die Voxel nicht direkt verändert werden
+                    foreach (int[] pos in positionenHinzufügenderVoxel)
+                    {
+                        m_Voxelmatrix[pos[0], pos[1], pos[2]].setModellrand(true);
+                    }
+                    positionenHinzufügenderVoxel.Clear();
                 }
-                //Damit das Verändern von Voxeln sich erst auf die nächste Iteration auswirkt, dürfen die Voxel nicht direkt verändert werden
-                foreach (int[] pos in positionenHinzufügenderVoxel)
-                {
-                    m_Voxelmatrix[pos[0], pos[1], pos[2]].setModellrand(true);
-                }
-                positionenHinzufügenderVoxel.Clear();
             }
         }
         /// <summary>
