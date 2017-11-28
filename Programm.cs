@@ -13,14 +13,13 @@ namespace Werkzeugbahnplanung
         {
 
         }
+        #region Input-Method
         /*Funktion für eine Input-Textdatei
           entsprechend der Einigung
           1. Zeile : Grundwerte Voxelmodell
           2.-N. Zeile: Voxel
           Als Ausgabewert wird das fertige Voxelmodell
-          zurückgegeben
-        */
-        #region Input-Method
+          zurückgegeben */
         public Voxelmodell Input(string filename)
         {
             //Erstelle Dateipfad und checke ob Datei vorhanden

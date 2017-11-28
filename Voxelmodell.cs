@@ -46,14 +46,15 @@ namespace Werkzeugbahnplanung
                         koords = voxel.getKoords();
                         //Falls kein Infill an Stelle des Voxels, lösche diesen
                         //aus unserem Voxelmodell
-                        if(!boundingBox[koords[0], koords[1], koords[2]])
+                        if (!boundingBox[koords[0], koords[1], koords[2]])
                         {
                             m_Voxelmatrix[koords[0], koords[1], koords[2]] = null;
-                            schicht.Remove(voxel); 
+                            schicht.Remove(voxel);
                         }
                     }
                 }
             }
+        }
         #endregion
     
         #region Randverbreiterung
