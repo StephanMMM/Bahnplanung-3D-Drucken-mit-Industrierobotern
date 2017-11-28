@@ -20,6 +20,7 @@ namespace Werkzeugbahnplanung
           Als Ausgabewert wird das fertige Voxelmodell
           zurückgegeben
         */
+        #region Input-Method
         public Voxelmodell Input(string filename)
         {
             //Erstelle Dateipfad und checke ob Datei vorhanden
@@ -79,5 +80,6 @@ namespace Werkzeugbahnplanung
                 return null;
             }
         }
+        #endregion
     }
 }
