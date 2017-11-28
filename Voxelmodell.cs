@@ -28,6 +28,7 @@ namespace Werkzeugbahnplanung
             m_Schichten = schichten;
         }
 
+        #region InsertInfill
         /*Funktion, die eine Boundingbox eines Infill-Musters
           (derselben Größe(!)) mit dem Voxelmodell merged.
           Bounding-Box : true = Voxel gesetzt im Infill */
@@ -53,9 +54,7 @@ namespace Werkzeugbahnplanung
                     }
                 }
             }
-        }
-
-    }
+        #endregion
     
         #region Randverbreiterung
         /// <summary>
