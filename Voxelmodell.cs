@@ -25,10 +25,28 @@ namespace Werkzeugbahnplanung
             m_Schichten = schichten;
         }
 
-        public void InsertInfill(bool[,,] boundingBox)
+                public void InsertInfill(bool[,,] boundingBox)
         {
-
+            ushort[] koords = new ushort[3];
+            foreach (List<Voxel> schicht in m_Schichten)
+            {
+                foreach (var voxel in schicht)
+                {
+                    if (voxel.getSchichtrand() != true)
+                    {
+                        koords = voxel.getKoords();
+                        if(boundingBox[koords[0], koords[1], koords[2]])
+                        {
+                            m_Voxelmatrix[koords[0], koords[1], koords[2]] = null;
+                            schicht.Remove(voxel); 
+                        }
+                    }
+                }
+            }
         }
+
+    }
+    
         #region Randverbreiterung
         /// <summary>
         /// Diese Methode ist dazu da, um den Modellrand (voll zu druckenden äußeren Bereich) verbreitern.
