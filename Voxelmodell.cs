@@ -12,9 +12,12 @@ namespace Werkzeugbahnplanung
         private int m_Boundingbox_x;
         private int m_Boundingbox_y;
         private int m_Boundingbox_z;
+        //3-D Voxelmodell
         private Voxel[,,] m_Voxelmatrix;
+        //Liste auf die entsprechenden Schichten-Listen
         private List<List<Voxel>> m_Schichten;
 
+        //Konstruktor für Input-Funktion vorgesehen
         public Voxelmodell(int anzahlSchichten, int Bb_x, int Bb_y, int Bb_z, Voxel[,,] voxelmatrix, List<List<Voxel>> schichten)
         {
             m_AnzahlSchichten = anzahlSchichten;
@@ -25,17 +28,24 @@ namespace Werkzeugbahnplanung
             m_Schichten = schichten;
         }
 
-                public void InsertInfill(bool[,,] boundingBox)
+        /*Funktion, die eine Boundingbox eines Infill-Musters
+          (derselben Größe(!)) mit dem Voxelmodell merged.
+          Bounding-Box : true = Voxel gesetzt im Infill */
+        public void InsertInfill(bool[,,] boundingBox)
         {
             ushort[] koords = new ushort[3];
+            //Schleifen die über alle Voxel des Modells gehen
             foreach (List<Voxel> schicht in m_Schichten)
             {
                 foreach (var voxel in schicht)
                 {
+                    //Voxel die Teil des Randes sind kommen nicht in Frage
                     if (voxel.getSchichtrand() != true)
                     {
                         koords = voxel.getKoords();
-                        if(boundingBox[koords[0], koords[1], koords[2]])
+                        //Falls kein Infill an Stelle des Voxels, lösche diesen
+                        //aus unserem Voxelmodell
+                        if(!boundingBox[koords[0], koords[1], koords[2]])
                         {
                             m_Voxelmatrix[koords[0], koords[1], koords[2]] = null;
                             schicht.Remove(voxel); 
