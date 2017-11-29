@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Werkzeugbahnplanung
+namespace Project
 {
     public class Voxel
     {
@@ -16,8 +12,7 @@ namespace Werkzeugbahnplanung
         {
             m_Schichtrand = false;
             m_Modellrand = false;
-            m_koordinaten = new ushort[3] { 0, 0, 0 };
-
+            m_koordinaten = new ushort[3]{0,0,0};
         }
 
         public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord)
@@ -53,6 +48,31 @@ namespace Werkzeugbahnplanung
         public ushort[] getKoords()
         {
             return m_koordinaten;
+        }
+        
+        //Prüfe ob zwei Voxel benachbart sind
+        public bool IsNeighbor(Voxel a)
+        {
+            /*
+             Zwei Voxel sind benachbart, wenn ihre einzelnen Koordinatendistanzen <=1 sind
+             d.h alle 26 Nachbarn gelten als Nachbarn und der Voxel selbst ist zu sich ebenfalls benachbart.
+             */
+            int[] distanz = this.VoxelKoordinatenDistanz(a);
+            if (distanz[0] <= 1 && distanz[1] <= 1 && distanz[2] <= 1)
+                return true;
+            else
+                return false;
+        }
+        
+        
+        // Erstelle ein Distanzarray der einzelnen Voxelkoordinaten für die Abstandsberechnung
+        public int[] VoxelKoordinatenDistanz(Voxel a)
+        {
+            int[] distanz = new int[3] {0,0,0};
+            distanz[0] = Math.Abs(this.getKoords()[0] - a.getKoords()[0]);
+            distanz[1] = Math.Abs(this.getKoords()[1] - a.getKoords()[1]);
+            distanz[2] = Math.Abs(this.getKoords()[2] - a.getKoords()[2]);
+            return distanz;
         }
     }
 }
