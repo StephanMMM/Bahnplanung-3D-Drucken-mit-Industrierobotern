@@ -55,10 +55,10 @@ namespace Project
         {
             /*
              Zwei Voxel sind benachbart, wenn ihre einzelnen Koordinatendistanzen <=1 sind
-             d.h alle 26 Nachbarn gelten als Nachbarn und der Voxel selbst ist zu sich ebenfalls benachbart.
+             d.h alle 26 Nachbarn gelten als Nachbarn.
              */
             int[] distanz = this.VoxelKoordinatenDistanz(a);
-            if (distanz[0] <= 1 && distanz[1] <= 1 && distanz[2] <= 1)
+            if ((distanz[0] <= 1 && distanz[1] <= 1 && distanz[2] <= 1))
                 return true;
             else
                 return false;
