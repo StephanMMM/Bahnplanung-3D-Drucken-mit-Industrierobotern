@@ -163,5 +163,16 @@ namespace Project
             
             // Verbesserung der ersten Lösung durch 2-opt
         }
-    }
+        
+        
+        /*
+        static void Main(string[] args)
+        {
+            List<Voxel> voxelList = new List<Voxel>();
+            Bahn bahn = new Bahn();
+            voxelList = bahn.GenerateTestData();
+            bahn.Bahnplanung(voxelList);
+        }
+        */
+    }  
 }
