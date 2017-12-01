@@ -74,5 +74,7 @@ namespace Project
             distanz[2] = Math.Abs(this.getKoords()[2] - a.getKoords()[2]);
             return distanz;
         }
+        
+        //public Voxel[] getNeighbors(Voxel a){siehe Randverbreiterung}
     }
 }
