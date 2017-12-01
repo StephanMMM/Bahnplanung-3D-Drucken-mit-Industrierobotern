@@ -41,7 +41,7 @@ namespace Werkzeugbahnplanung
                 foreach (var voxel in schicht)
                 {
                     //Voxel die Teil des Randes sind kommen nicht in Frage
-                    if (voxel.getSchichtrand() != true)
+                    if (voxel.getSchichtrand() != true) //#Question: Modellrand anstatt Schichtrand?
                     {
                         koords = voxel.getKoords();
                         //Falls kein Infill an Stelle des Voxels, lösche diesen
