@@ -66,7 +66,7 @@ namespace Werkzeugbahnplanung
         public void randVerbreiterung(int randBreite)
         {
             //Voxel werden erst in eine Liste eingetragen, bevor sie zum Rand hinzugefügt werden
-            List<int[]> positionenHinzufügenderVoxel = new List<int[]>();
+            List<ushort[]> hinzufügendeVoxel = new List<ushort[]>();
             /*Es werden immer benachbarte Voxel hinzugefügt.
             Um die gewünschte Breite zu erreichen, muss der Vorgang entsprechend oft durchgeführt werden.*/
             for (int i = 0; i < randBreite - 1; i++)
@@ -86,45 +86,53 @@ namespace Werkzeugbahnplanung
                          Die Programmierung ist auf 26 ausgelegt.
                          Bei jedem möglichen Nachbar ist zu prüfen, ob dieser im Modell liegt(nicht out of range) und existiert (nicht null)
                          Die Prüfung wurde in eine neue Methode ausgelagert. Sie wird mit allen Voxeln aufgerunfen, bei denen sich jede Koodinate, um max 1 unterscheiden.*/
-                        for (int x_div = -1; x_div <= 1; x_div++)
+                        foreach(Voxel v in getNeighbors(voxel))
                         {
-                            for (int y_div = -1; y_div <= 1; y_div++)
+                            if(v.getModellrand() == false)
                             {
-                                for (int z_div = -1; z_div <= 1; z_div++)
-                                {
-                                    if (pruefeVoxelAufVerbreiterung(x + x_div, y + y_div, z + z_div))
-                                    {
-                                        int[] pos = { x + x_div, y + y_div, z + z_div };
-                                        positionenHinzufügenderVoxel.Add(pos);
-                                    }
-                                }
+                                hinzufügendeVoxel.Add(v.getKoords());
                             }
                         }
                     }
                     //Damit das Verändern von Voxeln sich erst auf die nächste Iteration auswirkt, dürfen die Voxel nicht direkt verändert werden
-                    foreach (int[] pos in positionenHinzufügenderVoxel)
+                    foreach (ushort[] pos in hinzufügendeVoxel)
                     {
                         m_Voxelmatrix[pos[0], pos[1], pos[2]].setModellrand(true);
                     }
-                    positionenHinzufügenderVoxel.Clear();
+                    hinzufügendeVoxel.Clear();
                 }
             }
         }
-        /// <summary>
-        /// Diese Methode überprüft ob die übergebenen Koodinaten im Modell liegen und wenn ja ob der Voxel existiert und wenn ja ob er noch nicht zum Rand gehört
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
-        private bool pruefeVoxelAufVerbreiterung(int x, int y, int z)
-        {
-            return (x >= 0) && (x < m_Boundingbox_x) && //liegt mit der x-Koodinate im Modell
-                (y >= 0) && (y < m_Boundingbox_y) && //liegt mit der y-Koodinate im Modell
-                (z >= 0) && (z < m_Boundingbox_z) && //liegt mit der z-Koodinate im Modell
-                (m_Voxelmatrix[x, y, z] != null) && //nicht null
-                (m_Voxelmatrix[x, y, z].getModellrand() == false); //und noch kein Rand
-        }
         #endregion
+
+        /// <summary>
+        /// Diese Methode übergibt alle existierenden Nachbarn eines existierenden Voxels
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public List<Voxel> getNeighbors(Voxel a)
+        {
+            int x = a.getKoords()[0];
+            int y = a.getKoords()[1];
+            int z = a.getKoords()[2];
+            List<Voxel> nachbarn = new List<Voxel>();
+            for (int x_div = -1; x_div <= 1; x_div++)
+            {
+                for (int y_div = -1; y_div <= 1; y_div++)
+                {
+                    for (int z_div = -1; z_div <= 1; z_div++)
+                    {
+                        if ((x >= 0) && (x < m_Boundingbox_x) && //liegt mit der x-Koodinate im Modell
+                            (y >= 0) && (y < m_Boundingbox_y) && //liegt mit der y-Koodinate im Modell
+                            (z >= 0) && (z < m_Boundingbox_z) && //liegt mit der z-Koodinate im Modell
+                            (m_Voxelmatrix[x, y, z] != null))//nicht null)
+                        {
+                            nachbarn.Add(m_Voxelmatrix[x, y, z]);
+                        }
+                    }
+                }
+            }
+            return nachbarn;
+        }
     }
 }
