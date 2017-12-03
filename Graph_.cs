@@ -11,28 +11,24 @@ namespace Project
          Und jeder Graph eine Liste von Absetzpunkten, nach welchen der Roboter beim Drucken absetzen muss.
          */
         private List<List<double>> m_graph;
-        private List<List<bool>> m_absetzPunkte;
         private List<ushort[]> m_VoxelKoordinaten;
         
         //Konstruktoren
         public Graph_()
         {
             m_graph = new List<List<double>>();
-            m_absetzPunkte = new List<List<bool>>();
             m_VoxelKoordinaten = new List<ushort[]>();
         }
 
-        public Graph_(List<List<double>> graph, List<List<bool>> absetzPunkte, List<ushort[]> voxelKoordinaten)
+        public Graph_(List<List<double>> graph, List<ushort[]> voxelKoordinaten)
         {
             m_graph = graph;
-            m_absetzPunkte = absetzPunkte;
             m_VoxelKoordinaten = voxelKoordinaten;
         }
 
         public Graph_(Graph_ graph)
         {
             m_graph = graph.GetGraph();
-            m_absetzPunkte = graph.GetAlleAbsetzpunkte();
             m_VoxelKoordinaten = graph.GetVoxelKoordinaten();
         }
 
@@ -47,16 +43,6 @@ namespace Project
             return m_graph[i][j];
         }
 
-        public List<List<bool>> GetAlleAbsetzpunkte()
-        {
-            return m_absetzPunkte;
-        }
-
-        public bool GetAbsetzpunkt(int i, int j)
-        {
-            return m_absetzPunkte[i][j];
-        }
-
         public List<ushort[]> GetVoxelKoordinaten()
         {
             return m_VoxelKoordinaten;
@@ -65,6 +51,17 @@ namespace Project
         public ushort[] GetVoxelKoordinaten(int i)
         {
             return m_VoxelKoordinaten[i];
+        }
+
+        public ushort GetVoxelKoordinate(int i, ushort index)
+        {
+            /*
+             *  index == 0 -> x-Koordinate
+             *  index == 1 -> y-Koordinate
+             *  index == 2 -> z-Koordinate
+             */
+            ushort[] koordinaten = m_VoxelKoordinaten[i];
+            return koordinaten[index];
         }
 
         
@@ -78,17 +75,7 @@ namespace Project
         {
             m_graph[i][j] = d;
         }
-
-        public void SetAbsetzPunkte(List<List<bool>> absetzPunkte)
-        {
-            m_absetzPunkte = absetzPunkte;
-        }
-
-        public void SetAbsetzPunkte(bool b, int i, int j)
-        {
-            m_absetzPunkte[i][j] = b;
-        }
-
+        
         public void SetVoxelKoordinaten(ushort[] k ,int i)
         {
             m_VoxelKoordinaten[i] = k;
@@ -98,11 +85,6 @@ namespace Project
         public void AddGraphElement(List<double> d)
         {
             m_graph.Add(d);
-        }
-
-        public void AddAbsetzPunkt(List<bool> b)
-        {
-            m_absetzPunkte.Add(b);
         }
 
         public void AddVoxelKoordinaten(ushort[] k)

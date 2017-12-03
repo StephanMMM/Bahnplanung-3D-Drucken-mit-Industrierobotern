@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Project
 {
@@ -42,12 +43,10 @@ namespace Project
         private Graph_ VoxelToGraph(List<Voxel> voxel)
         {       
             Graph_ graph = new Graph_();
-            int i = 0;
             
             foreach (var v in voxel)
             {
                 List<double> graphElemente = new List<double>();
-                List<bool> absetzPunkte = new List<bool>();
                 foreach (var w in voxel)
                 {
                     int[] distanz = new int[3] {0, 0, 0};
@@ -58,121 +57,145 @@ namespace Project
                      * zu den anderen Knoten. Füge die VoxelKoordinaten hinzu und die Punkte an denen abgesetzt
                      * werden muss.
                     */
-                    if (v.IsNeighbor(w))
-                    {
+                    /*
+                     * Nachbarschaftsfunktion je nach Druckwunsch auswählen
+                     */
+                    if (v.IsNeighbor6(w))                  
                         graphElemente.Add(Math.Sqrt(Math.Pow(distanz[0], 2) + Math.Pow(distanz[1], 2) + Math.Pow(distanz[2],2)));
-                        absetzPunkte.Add(false);
-                    }
-                    else
-                    {
+                    
+                    else                 
                         graphElemente.Add(ABSETZKOSTEN + Math.Sqrt(Math.Pow(distanz[0], 2) + Math.Pow(distanz[1], 2) + Math.Pow(distanz[2],2)));
-                        absetzPunkte.Add(true);
-                    }                  
+                                      
                 }
                 graph.AddGraphElement(graphElemente);             
-                graph.AddAbsetzPunkt(absetzPunkte);
                 graph.AddVoxelKoordinaten(v.getKoords());
             }
             return graph;
         }
 
 
-        private static Graph_ MarkiereKnoten(int Knoten, Graph_ graph)
+        //Markiert jeweils die Kosten eines Knotens zu sich selber
+        private Graph_ MarkiereEigenknoten(int knoten, Graph_ graph)
         {
-            for(int i =0; i < graph.GetGraph().Count; i++)
+            for(int i = 0; i < graph.GetGraph().Count; i++)
             {
-                graph.SetGraph(MARKIERKOSTEN, i, Knoten);
+                // Wegen der Matrixeigenschaft der Liste von Listen im Graph
+                graph.SetGraph(graph.GetGraphElement(i,i)+MARKIERKOSTEN, i, i);
             }
             return graph;
         }
         
-        /*
-         * 1. Startvoxel markieren notwendig mit extra kosten
-         * 2. Richtige Reihenfolge :/
-         * 3. Kosten für Tour (nach der Funktion erforderllch, nicht in der Funktion)
-         */
-        private List<uint> NearestNeighbor(Graph_ graph)
+        //Markiert einen Knoten, für alle anderen Knoten in den Kostenlisten
+        private static Graph_ MarkiereKnoten(int knoten, Graph_ graph)
         {
-            // List zum Speichern der Druckreihenfolge der Voxel (Graphknoten)
-            List<uint> priority = new List<uint>();
-            
-            // 1. Startpunkt = Erster Knoten
-            /*
-            //Markiere alle Knoten in der Liste die zu sich selbst mit Kosten 0 benachbart sind
-            for (int i = 0; i < graph.GetGraph().Count; i++)
+            for(int i =0; i < graph.GetGraph().Count; i++)
             {
-                MarkiereKnoten(i, graph);
-                Console.Write(graph.GetGraphElement(i,0));
-                Console.Write(" ");
+                graph.SetGraph(graph.GetGraphElement(i,knoten)+MARKIERKOSTEN, i, knoten);
             }
-                minimum = graph.GetGraphElement(0,1);
-                priority.Add(1);
-                MarkiereKnoten(1, graph);
-            */
-            
-            /*
-             * 2. Finde Kante mit geringsten Kosten vom Startknoten aus
-             * Iteriere über die Anzahl der Elemente in jeder Liste                
-            */
-            int minimumKnotenNummer = 0;
-            
-            for (int i = 0; i < graph.GetGraph().Count; i++)
-            {
-                double minimum = 150;
-                for (int j = 0; j < graph.GetGraph().Count; j++)
-                {
-                    if (graph.GetGraphElement(i, j) < minimum)
-                    {
-                        minimum = graph.GetGraphElement(i, j);
-                        minimumKnotenNummer = i;
-                    }
-                }
-                //3. Füge den Knoten in die Druckreihenfolge ein
-                priority.Add((uint) minimumKnotenNummer);
-                //4. Markiere den eingefügten Knoten für alle anderen Knoten (Kosten +100?)
-                MarkiereKnoten(i, graph);
-            }        
-            return priority;
+            graph.SetGraph(graph.GetGraphElement(knoten,knoten)-MARKIERKOSTEN, knoten, knoten);
+            return graph;
         }
         
-
-        // Bahnplanungsalgorithmen
-        public void Bahnplanung(List<Voxel> voxelList)
+        // Generieren einer ersten Bahnplanungslösung mit dem Nearest-Neighbor Verfahren
+        private Druckfolge NearestNeighbor(Graph_ graph)
         {
-            // Teilen der gesamten Voxelliste in Randvoxel und Rest, damit unterschiedliche Bahnen geplant werden können
-            List<Voxel> rand = new List<Voxel>();
-            List<Voxel> rest = new List<Voxel>();
+            // List zum Speichern der Druckreihenfolge der Voxel (Graphknoten)
+            Druckfolge druckfolge = new Druckfolge();
+            Graph_ workingGraph = new Graph_(graph);
+
+            // Markiere die Diagonale in der Kostenmatrix mit zusätzlichen Kosten
+            MarkiereEigenknoten(0, workingGraph);
+            
+            // 1. Startpunkt = Erster Knoten
+            int aktuellerKnoten = 0;
+            int minimumKnotenNummer = 0;       
+            
+            // Füge den Startknoten in die Druckreihenfolge ein
+            druckfolge.AddPriority(0);
+                 
+            for (int i = 0; i < workingGraph.GetGraph().Count - 1; i++)
+            {
+                // Aktualisiere den aktuellen Knoten
+                aktuellerKnoten = minimumKnotenNummer;
+                
+                // Markiere aktuellen Knoten mit zusätzlichen Kosten
+                MarkiereKnoten(aktuellerKnoten, workingGraph);
+                
+                double minimum = MARKIERKOSTEN*10;
+                for (int j = 0; j < workingGraph.GetGraph().Count; j++)
+                {
+                    if (workingGraph.GetGraphElement(aktuellerKnoten, j) < minimum)
+                    {
+                        minimum = workingGraph.GetGraphElement(aktuellerKnoten, j);
+                        minimumKnotenNummer = j;
+                    }
+                }
+                // Füge den Knoten mit günstigster Kante in die Druckreihenfolge ein               
+                druckfolge.AddPriority((uint) minimumKnotenNummer);
+                druckfolge.SummiereGesamtkosten((uint) minimum);
+            }        
+            return druckfolge;
+        }
+
+
+        public List<List<Voxel>> SplitVoxelList(List<Voxel> voxelList)
+        {
+            List<Voxel> voxelListEins = new List<Voxel>();           
+            List<Voxel> voxelListZwei = new List<Voxel>(); 
+            
             foreach (var v in voxelList)
             {
                 if (v.getSchichtrand() == true)
-                {
-                    rand.Add(v);
-                }
+                    voxelListEins.Add(v);
                 else
-                {
-                    rest.Add(v);
-                }
+                    voxelListZwei.Add(v);
             }
-            // Erstelle zwei Graphen : Randvoxel-Graph und Restvoxel-Graph
-            Graph_ randGraph = new Graph_(VoxelToGraph(rand));
-            Graph_ restGraph = new Graph_(VoxelToGraph(rest));
-
-            // Erstellen der ersten Druckreihenfolge
-            List<uint> priority_rand = NearestNeighbor(randGraph);
-            List<uint> priority_rest = NearestNeighbor(restGraph);
+            List<List<Voxel>> splitList = new List<List<Voxel>>();
+            splitList.Add(voxelListEins);
+            splitList.Add(voxelListZwei);
+            return splitList;
+        }
+        
+        // Bahnplanungsalgorithmen
+        public void Bahnplanung(List<Voxel> voxelList)
+        {
+            /*
+             * Teilen der gesamten Voxelliste in Randvoxel und Rest, damit unterschiedliche Bahnen geplant werden können
+             * splitList[0] enthält Schichtränder
+             * splitList[1] enthält alle anderen Voxel
+             */            
+            List<List<Voxel>> splitList = new List<List<Voxel>>(SplitVoxelList(voxelList));
             
+            // Erstelle zwei Graphen : Randvoxel-Graph und Restvoxel-Graph
+            Graph_ randGraph = new Graph_(VoxelToGraph(splitList[0]));
+            Graph_ restGraph = new Graph_(VoxelToGraph(splitList[1]));
+
+            // Erstellen der Druckfolgen
+            Druckfolge druckFolgeRand = new Druckfolge(NearestNeighbor(randGraph));
+            Druckfolge druckFolgeRest = new Druckfolge(NearestNeighbor(restGraph));
+                        
+            // Textoutput für Koordinate(X,Y,Z), Priority
+            string path = "F:\\Uni\\Uni WS 17_18\\Studienprojekt\\ProgrammierKram\\GraphUmwandlung";
+            using (StreamWriter outputFile = new StreamWriter(path + @"\Data.txt"))
+            {
+                uint index = 0;
+                for (int i = 0; i < randGraph.GetVoxelKoordinaten().Count; i++)
+                {
+                    index = druckFolgeRand.GetPriorityItem(i);
+                    outputFile.Write(randGraph.GetVoxelKoordinate((int) index, 0) + " " +
+                                     randGraph.GetVoxelKoordinate((int) index, 1) + " " +
+                                     randGraph.GetVoxelKoordinate((int) index, 2) + "\r\n");
+                }
+            }           
             // Verbesserung der ersten Lösung durch 2-opt
         }
-        
-        
-        /*
+               
         static void Main(string[] args)
         {
-            List<Voxel> voxelList = new List<Voxel>();
             Bahn bahn = new Bahn();
-            voxelList = bahn.GenerateTestData();
+            List<Voxel> voxelList = new List<Voxel>(bahn.GenerateTestData());
             bahn.Bahnplanung(voxelList);
         }
-        */
+        
     }  
 }
