@@ -1,0 +1,34 @@
+#3*3*3 Box mit nicht ebenen Schichten
+#boundB_x boundB_y boundB_z anzSchichten
+3 3 3 3
+#x y z schichtrand modellrand schicht
+#Ebene 0
+0 0 0 1 1 0
+1 0 0 1 1 0
+2 0 0 1 1 0
+0 1 0 1 1 0
+1 1 0 0 1 0
+2 1 0 1 1 0
+0 2 0 1 1 0
+1 2 0 1 1 1
+2 2 0 1 1 1
+#Ebene 1
+0 0 1 1 1 2
+1 0 1 1 1 2
+2 0 1 1 1 1
+0 1 1 1 1 1
+1 1 1 0 0 1
+2 1 1 1 1 1
+0 2 1 1 1 1
+1 2 1 1 1 1
+2 2 1 1 1 1
+#Ebene 2
+0 0 2 1 1 2
+1 0 2 1 1 2
+2 0 2 1 1 2
+0 1 2 1 1 1
+1 1 2 0 1 2
+2 1 2 1 1 2
+0 2 2 1 1 1
+1 2 2 1 1 2
+2 2 2 1 1 2
