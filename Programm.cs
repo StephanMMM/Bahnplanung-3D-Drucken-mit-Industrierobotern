@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,9 +11,11 @@ namespace Werkzeugbahnplanung
     {
         static void Main(string[] args)
         {
+            Voxelmodell v = Input("Test3.txt");
+            randverbreiterungtesten(v);
 
         }
-                #region Input-Method
+        #region Input-Method
         /*Funktion für eine Input-Textdatei
           entsprechend der Einigung
           1. Zeile : Grundwerte Voxelmodell
@@ -87,6 +89,41 @@ namespace Werkzeugbahnplanung
                 }
             } //Falls keine Zeile dem gewünschten Format entspricht, wird abgebrochen
             return null;
+        }
+        #endregion
+        #region Tests
+        public static void randverbreiterungtesten(Voxelmodell voxelmodell)
+        {
+            Voxelmodell voxelmodell1 = voxelmodell;
+            voxelmodell1.randVerbreiterung(1);
+            using (StreamWriter file = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "randverbreiterung1.txt")))
+            {
+                file.WriteLine("#Randverbreiterung mit 1");
+                foreach(Voxel v in voxelmodell1.getVoxelmatrix())
+                {
+                    file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                }
+            }
+            Voxelmodell voxelmodell2 = voxelmodell;
+            voxelmodell1.randVerbreiterung(2);
+            using (StreamWriter file = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "randverbreiterung2.txt")))
+            {
+                file.WriteLine("#Randverbreiterung mit 1");
+                foreach (Voxel v in voxelmodell1.getVoxelmatrix())
+                {
+                    file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                }
+            }
+            Voxelmodell voxelmodell3 = voxelmodell;
+            voxelmodell1.randVerbreiterung(3);
+            using (StreamWriter file = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "randverbreiterung3.txt")))
+            {
+                file.WriteLine("#Randverbreiterung mit 1");
+                foreach (Voxel v in voxelmodell1.getVoxelmatrix())
+                {
+                    file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                }
+            }
         }
         #endregion
     }
