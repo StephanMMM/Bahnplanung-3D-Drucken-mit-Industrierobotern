@@ -1,3 +1,4 @@
+using Werkzeugbahnplanung;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,14 @@ namespace Werkzeugbahnplanung
             m_Boundingbox_z = Bb_z;
             m_Voxelmatrix = voxelmatrix;
             m_Schichten = schichten;
+        }
+        /// <summary>
+        /// lediglich benötigt, um die Randverbreiterung einfacher zu testen
+        /// </summary>
+        /// <returns></returns>
+        public Voxel[,,] getVoxelmatrix()
+        {
+            return m_Voxelmatrix;
         }
 
         #region InsertInfill
@@ -94,16 +103,15 @@ namespace Werkzeugbahnplanung
                             }
                         }
                     }
-                    //Damit das Verändern von Voxeln sich erst auf die nächste Iteration auswirkt, dürfen die Voxel nicht direkt verändert werden
-                    foreach (ushort[] pos in hinzufügendeVoxel)
-                    {
-                        m_Voxelmatrix[pos[0], pos[1], pos[2]].setModellrand(true);
-                    }
-                    hinzufügendeVoxel.Clear();
                 }
+                //Damit das Verändern von Voxeln sich erst auf die nächste Iteration auswirkt, dürfen die Voxel nicht direkt verändert werden
+                foreach (ushort[] pos in hinzufügendeVoxel)
+                {
+                    m_Voxelmatrix[pos[0], pos[1], pos[2]].setModellrand(true);
+                }
+                hinzufügendeVoxel.Clear();
             }
         }
-        #endregion
 
         /// <summary>
         /// Diese Methode übergibt alle existierenden Nachbarn eines existierenden Voxels
@@ -122,12 +130,12 @@ namespace Werkzeugbahnplanung
                 {
                     for (int z_div = -1; z_div <= 1; z_div++)
                     {
-                        if ((x >= 0) && (x < m_Boundingbox_x) && //liegt mit der x-Koodinate im Modell
-                            (y >= 0) && (y < m_Boundingbox_y) && //liegt mit der y-Koodinate im Modell
-                            (z >= 0) && (z < m_Boundingbox_z) && //liegt mit der z-Koodinate im Modell
+                        if ((x+x_div >= 0) && (x+x_div < m_Boundingbox_x) && //liegt mit der x-Koodinate im Modell
+                            (y+y_div >= 0) && (y+y_div < m_Boundingbox_y) && //liegt mit der y-Koodinate im Modell
+                            (z+z_div >= 0) && (z+z_div < m_Boundingbox_z) && //liegt mit der z-Koodinate im Modell
                             (m_Voxelmatrix[x, y, z] != null))//nicht null)
                         {
-                            nachbarn.Add(m_Voxelmatrix[x, y, z]);
+                            nachbarn.Add(m_Voxelmatrix[x+x_div, y+y_div, z+z_div]);
                         }
                     }
                 }
@@ -135,4 +143,5 @@ namespace Werkzeugbahnplanung
             return nachbarn;
         }
     }
+    #endregion
 }
