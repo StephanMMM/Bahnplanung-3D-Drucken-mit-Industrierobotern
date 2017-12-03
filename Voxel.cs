@@ -51,20 +51,31 @@ namespace Project
         }
         
         //Prüfe ob zwei Voxel benachbart sind
-        public bool IsNeighbor(Voxel a)
+        public bool IsNeighbor26(Voxel a)
         {
             /*
              Zwei Voxel sind benachbart, wenn ihre einzelnen Koordinatendistanzen <=1 sind
-             d.h alle 26 Nachbarn gelten als Nachbarn.
+             d.h alle 26 Nachbarn gelten als Nachbarn. Ein Voxel ist zu sich selbst nicht benachbart.
              */
             int[] distanz = this.VoxelKoordinatenDistanz(a);
-            if ((distanz[0] <= 1 && distanz[1] <= 1 && distanz[2] <= 1))
+            int distanzSumme = distanz[0] + distanz[1] + distanz[2];
+            if ((distanz[0] <= 1 && distanz[1] <= 1 && distanz[2] <= 1)&&(distanzSumme != 0))
                 return true;
             else
                 return false;
         }
-        
-        
+
+        public bool IsNeighbor6(Voxel a)
+        {
+            int[] distanz = this.VoxelKoordinatenDistanz(a);
+            if ((distanz[0] == 0 && distanz[1] == 0 && distanz[2] == 1) ||
+                (distanz[0] == 0 && distanz[1] == 1 && distanz[2] == 0) ||
+                (distanz[0] == 1 && distanz[1] == 0 && distanz[2] == 0))
+                return true;
+            else
+                return false;
+        }
+
         // Erstelle ein Distanzarray der einzelnen Voxelkoordinaten für die Abstandsberechnung
         public int[] VoxelKoordinatenDistanz(Voxel a)
         {
