@@ -13,7 +13,7 @@ namespace Werkzeugbahnplanung
         {
             Voxelmodell v = Input("Test3.txt");
             randverbreiterungtesten(v);
-
+            testeMuster(v);
         }
         #region Input-Method
         /*Funktion für eine Input-Textdatei
@@ -91,7 +91,11 @@ namespace Werkzeugbahnplanung
             return null;
         }
         #endregion
-        #region Tests
+       #region Tests
+        /// <summary>
+        /// Testet Randverbreiterung; Funktioniert nicht mit null Werten...
+        /// </summary>
+        /// <param name="voxelmodell"></param>
         public static void randverbreiterungtesten(Voxelmodell voxelmodell)
         {
             Voxelmodell voxelmodell1 = voxelmodell;
@@ -101,7 +105,10 @@ namespace Werkzeugbahnplanung
                 file.WriteLine("#Randverbreiterung mit 1");
                 foreach(Voxel v in voxelmodell1.getVoxelmatrix())
                 {
-                    file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                    if(v != null)
+                    {
+                        file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                    }
                 }
             }
             Voxelmodell voxelmodell2 = voxelmodell;
@@ -111,7 +118,10 @@ namespace Werkzeugbahnplanung
                 file.WriteLine("#Randverbreiterung mit 1");
                 foreach (Voxel v in voxelmodell1.getVoxelmatrix())
                 {
-                    file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                    if (v != null)
+                    {
+                        file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                    }
                 }
             }
             Voxelmodell voxelmodell3 = voxelmodell;
@@ -121,7 +131,67 @@ namespace Werkzeugbahnplanung
                 file.WriteLine("#Randverbreiterung mit 1");
                 foreach (Voxel v in voxelmodell1.getVoxelmatrix())
                 {
-                    file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                    if (v != null)
+                    {
+                        file.WriteLine(v.getKoords()[0].ToString() + " " + v.getKoords()[1].ToString() + " " + v.getKoords()[2].ToString() + " " + Convert.ToInt16(v.getModellrand()).ToString());
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Testet Die Mustereinprägung in das Modell. Eingestellt auf 5*5*5 Muster.
+        /// </summary>
+        /// <param name="voxelmodell"></param>
+        public static void testeMuster(Voxelmodell voxelmodell)
+        {
+            Voxelmodell voxelmodell1 = voxelmodell;
+            int x = 5, y = 5, z = 5;
+            bool[,,] Testmuster = new bool[x, y, z];
+            //Testmuster erstellen
+            for(int i = 0; i < x; i++)
+            {
+                for(int j = 0; j < y; j++)
+                {
+                    for(int k = 0; k < z; k++)
+                    {
+                        if(((i%2)*(j%2)*(k%2)) == 1)
+                        {
+                            Testmuster[i, j, k] = false;
+                        }
+                        else
+                        {
+                            Testmuster[i, j, k] = true;
+                        }
+                    }
+                }
+            }
+            voxelmodell1.Infillmustererzeugen(Testmuster);
+            Voxel[,,] matrix = voxelmodell1.getVoxelmatrix();
+            using (StreamWriter file = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "mustererzeugung.txt")))
+            {
+                file.WriteLine("#Muster mit %2 test");
+                for (int i = 0; i < x; i++)
+                {
+                    for (int j = 0; j < y; j++)
+                    {
+                        for (int k = 0; k < z; k++)
+                        {
+                            string c;
+                            if(matrix[i,j,k] == null)
+                            {
+                                c = "0"; //markiert gelöschte Voxel
+                            }
+                            else if (matrix[i, j, k].getModellrand())
+                            {
+                                c = "1"; //markiert randvoxel
+                            }
+                            else
+                            {
+                                c = "2"; //markietr mustervoxel
+                            }
+                            file.WriteLine(i + " " + j + " " + k + " " + c);
+                        }
+                    }
                 }
             }
         }
