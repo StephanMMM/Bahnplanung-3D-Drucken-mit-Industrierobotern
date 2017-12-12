@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Project
+namespace Werkzeugbahnplanung
 {
     public class Voxel
     {
