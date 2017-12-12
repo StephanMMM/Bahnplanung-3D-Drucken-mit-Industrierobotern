@@ -146,32 +146,6 @@ namespace Werkzeugbahnplanung
             return nachbarn;
         }
         #endregion
-        #region Infillmuster
-        public void Infillmustererzeugen(bool[,,] Musterbox)
-        {
-            //Gehe alle Voxel durch
-            foreach (List<Voxel> schicht in m_Schichten)
-            {
-                for (int i = 0; i<schicht.Count(); i++)
-                {
-                    Voxel v = schicht[i];
-                    //Voxel soll existieren und kein Modellrandvoxel sein, da diese immer alle gedruckt werden
-                    if (v != null && v.getModellrand() != true)
-                    {
-                        //Falls an der Voxel nicht zum Muster gehört
-                        int x = v.getKoords()[0], y = v.getKoords()[1], z = v.getKoords()[2];
-                        if (Musterbox[x, y, z] == false)
-                        {
-                            //Lösche diesen Voxel aus dem Modell
-                            m_Voxelmatrix[x, y, z] = null;
-                            //und aus der Schicht, weil das Löschen aus dem Modell scheinabr nicht ausreicht
-                            schicht.Remove(v);
-                        }
-                    }
-                }
-            }
-        }
-    #endregion
     }
    
 }
