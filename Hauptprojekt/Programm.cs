@@ -13,7 +13,7 @@ namespace Werkzeugbahnplanung
         {
             Voxelmodell v = Input("Test3.txt");
             randverbreiterungtesten(v);
-            testeMuster();
+            testeMuster(v);
         }
         #region Input-Method
         /*Funktion für eine Input-Textdatei
@@ -80,7 +80,7 @@ namespace Werkzeugbahnplanung
                         }
                     }
                     //Erstellt Voxelmodell wenn Datei vollkommen durchlaufen und gebe diese zurück
-                    Voxelmodell voxelmodell = new Voxelmodell(anzSchichten, voxelmatrix, schichten);
+                    Voxelmodell voxelmodell = new Voxelmodell(anzSchichten, boundB_x, boundB_y, boundB_z, voxelmatrix, schichten);
                     return voxelmodell;
                 }
                 else
@@ -142,25 +142,30 @@ namespace Werkzeugbahnplanung
         /// Testet Die Mustereinprägung in das Modell. Eingestellt auf 5*5*5 Muster.
         /// </summary>
         /// <param name="voxelmodell"></param>
-        public static void testeMuster()
+        public static void testeMuster(Voxelmodell voxelmodell)
         {
-            int x = 30, y = 30, z = 30;
-            List<List<Voxel>> schichten = new List<List<Voxel>>();
-            schichten.Add(new List<Voxel>());
-            Voxel[,,] bb = new Voxel[x, y, z];
-            for (ushort i = 0; i < x; i++) {
-                for (ushort j = 0; j < x; j++)
+            Voxelmodell voxelmodell1 = voxelmodell;
+            int x = 5, y = 5, z = 5;
+            bool[,,] Testmuster = new bool[x, y, z];
+            //Testmuster erstellen
+            for(int i = 0; i < x; i++)
+            {
+                for(int j = 0; j < y; j++)
                 {
-                    for (ushort k = 0; k < x; k++)
+                    for(int k = 0; k < z; k++)
                     {
-                        Voxel v = new Voxel(false, false, i, j, k);
-                        bb[i, j, k] = v;
-                        schichten[0].Add(v);
+                        if(((i%2)*(j%2)*(k%2)) == 1)
+                        {
+                            Testmuster[i, j, k] = false;
+                        }
+                        else
+                        {
+                            Testmuster[i, j, k] = true;
+                        }
                     }
                 }
             }
-            Voxelmodell voxelmodell1 = new Voxelmodell(0, bb, schichten); ;
-            voxelmodell1.InsertInfill();
+            voxelmodell1.Infillmustererzeugen(Testmuster);
             Voxel[,,] matrix = voxelmodell1.getVoxelmatrix();
             using (StreamWriter file = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "mustererzeugung.txt")))
             {
@@ -172,15 +177,19 @@ namespace Werkzeugbahnplanung
                         for (int k = 0; k < z; k++)
                         {
                             string c;
-                            if (matrix[i, j, k] == null)
+                            if(matrix[i,j,k] == null)
                             {
-                                c = "0"; //markiert leerer voxel
+                                c = "0"; //markiert gelöschte Voxel
+                            }
+                            else if (matrix[i, j, k].getModellrand())
+                            {
+                                c = "1"; //markiert randvoxel
                             }
                             else
                             {
-                                c = "1"; //leerer voxel
-                                file.WriteLine(i + " " + j + " " + k + " " + c);
+                                c = "2"; //markietr mustervoxel
                             }
+                            file.WriteLine(i + " " + j + " " + k + " " + c);
                         }
                     }
                 }

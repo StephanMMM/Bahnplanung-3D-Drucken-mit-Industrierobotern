@@ -10,17 +10,21 @@ namespace Werkzeugbahnplanung
     public class Voxelmodell
     {
         private int m_AnzahlSchichten;
-        private Infill m_Boundingbox;
+        private int m_Boundingbox_x;
+        private int m_Boundingbox_y;
+        private int m_Boundingbox_z;
         //3-D Voxelmodell
         private Voxel[,,] m_Voxelmatrix;
         //Liste auf die entsprechenden Schichten-Listen
         private List<List<Voxel>> m_Schichten;
 
         //Konstruktor für Input-Funktion vorgesehen
-        public Voxelmodell(int anzahlSchichten,Voxel[,,] voxelmatrix, List<List<Voxel>> schichten, int infillDensity = 20, string infillType = "3DInfill")
+        public Voxelmodell(int anzahlSchichten, int Bb_x, int Bb_y, int Bb_z, Voxel[,,] voxelmatrix, List<List<Voxel>> schichten)
         {
             m_AnzahlSchichten = anzahlSchichten;
-            m_Boundingbox = new Infill(infillDensity, infillType);
+            m_Boundingbox_x = Bb_x;
+            m_Boundingbox_y = Bb_y;
+            m_Boundingbox_z = Bb_z;
             m_Voxelmatrix = voxelmatrix;
             m_Schichten = schichten;
         }
@@ -41,25 +45,24 @@ namespace Werkzeugbahnplanung
         /*Funktion, die eine Boundingbox eines Infill-Musters
           (derselben Größe(!)) mit dem Voxelmodell merged.
           Bounding-Box : true = Voxel gesetzt im Infill */
-        public void InsertInfill()
+        public void InsertInfill(bool[,,] boundingBox)
         {
             ushort[] koords = new ushort[3];
             //Schleifen die über alle Voxel des Modells gehen
             foreach (List<Voxel> schicht in m_Schichten)
             {
-                for (int i = 0; i < schicht.Count(); i++)
+                foreach (var voxel in schicht)
                 {
                     //Voxel die Teil des Randes sind kommen nicht in Frage
-                    if (schicht[i].getSchichtrand() != true) //#Question: Modellrand anstatt Schichtrand?
+                    if (voxel.getSchichtrand() != true) //#Question: Modellrand anstatt Schichtrand?
                     {
-                        koords = schicht[i].getKoords();
+                        koords = voxel.getKoords();
                         //Falls kein Infill an Stelle des Voxels, lösche diesen
                         //aus unserem Voxelmodell
-                        if (0 == m_Boundingbox.IsInfill(koords[0], koords[1], koords[2]))
+                        if (!boundingBox[koords[0], koords[1], koords[2]])
                         {
                             m_Voxelmatrix[koords[0], koords[1], koords[2]] = null;
-                            schicht.Remove(schicht[i]);
-                            i--;
+                            schicht.Remove(voxel);
                         }
                     }
                 }
@@ -113,6 +116,7 @@ namespace Werkzeugbahnplanung
                 hinzufügendeVoxel.Clear();
             }
         }
+
         /// <summary>
         /// Diese Methode übergibt alle existierenden Nachbarn eines existierenden Voxels
         /// </summary>
@@ -130,15 +134,12 @@ namespace Werkzeugbahnplanung
                 {
                     for (int z_div = -1; z_div <= 1; z_div++)
                     {
-                        try
+                        if ((x+x_div >= 0) && (x+x_div < m_Boundingbox_x) && //liegt mit der x-Koodinate im Modell
+                            (y+y_div >= 0) && (y+y_div < m_Boundingbox_y) && //liegt mit der y-Koodinate im Modell
+                            (z+z_div >= 0) && (z+z_div < m_Boundingbox_z) && //liegt mit der z-Koodinate im Modell
+                            (m_Voxelmatrix[x, y, z] != null))//nicht null)
                         {
-                            if (a.IsNeighbor26(m_Voxelmatrix[x + x_div, y + y_div, z + z_div]))//nicht null)
-                            {
-                                nachbarn.Add(m_Voxelmatrix[x + x_div, y + y_div, z + z_div]);
-                            }
-                        }
-                        catch (IndexOutOfRangeException) {
-
+                            nachbarn.Add(m_Voxelmatrix[x+x_div, y+y_div, z+z_div]);
                         }
                     }
                 }
