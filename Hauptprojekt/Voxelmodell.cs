@@ -10,17 +10,21 @@ namespace Werkzeugbahnplanung
     public class Voxelmodell
     {
         private int m_AnzahlSchichten;
-        private Infill m_Boundingbox;
+        private int m_Boundingbox_x;
+        private int m_Boundingbox_y;
+        private int m_Boundingbox_z;
         //3-D Voxelmodell
         private Voxel[,,] m_Voxelmatrix;
         //Liste auf die entsprechenden Schichten-Listen
         private List<List<Voxel>> m_Schichten;
 
         //Konstruktor für Input-Funktion vorgesehen
-        public Voxelmodell(int anzahlSchichten,int infillDensity=0 ,string infillType="3DInfill",Voxel[,,] voxelmatrix, List<List<Voxel>> schichten)
+        public Voxelmodell(int anzahlSchichten, int Bb_x, int Bb_y, int Bb_z, Voxel[,,] voxelmatrix, List<List<Voxel>> schichten)
         {
             m_AnzahlSchichten = anzahlSchichten;
-            m_Boundingbox = new Infill(infillDensity,infillType)
+            m_Boundingbox_x = Bb_x;
+            m_Boundingbox_y = Bb_y;
+            m_Boundingbox_z = Bb_z;
             m_Voxelmatrix = voxelmatrix;
             m_Schichten = schichten;
         }
@@ -55,7 +59,7 @@ namespace Werkzeugbahnplanung
                         koords = voxel.getKoords();
                         //Falls kein Infill an Stelle des Voxels, lösche diesen
                         //aus unserem Voxelmodell
-                        if (0 == Infill[koords[0], koords[1], koords[2]])
+                        if (!boundingBox[koords[0], koords[1], koords[2]])
                         {
                             m_Voxelmatrix[koords[0], koords[1], koords[2]] = null;
                             schicht.Remove(voxel);
