@@ -141,7 +141,7 @@ namespace Werkzeugbahnplanung
             return Sample;
         }
 
-        public int Is_HexInfill(int x, int y, int z)
+        private int Is_HexInfill(int x, int y, int z)
         {
             Boolean isEven = (0 == (x / (infill_density + (infill_density / 2) - 1)) % 2);
             y = y % (2 * infill_density - 1);
@@ -153,7 +153,7 @@ namespace Werkzeugbahnplanung
             }
             return BaseCell[x, y, 0];
         }
-        public int Is_LineInfill(int x, int y, int z)
+        private int Is_LineInfill(int x, int y, int z)
         {
             if (x % (infill_density * 2) == infill_offset || y % (infill_density * 2) == infill_offset) {
                 return 1;
@@ -161,7 +161,7 @@ namespace Werkzeugbahnplanung
             return 0;
         }
 
-        public int Is_Line3DInfill(int x, int y, int z)
+        private int Is_Line3DInfill(int x, int y, int z)
         {
             //figure out how too turn offset in ° -> 45° tilt:
             if (infill_offset != 0) {
