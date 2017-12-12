@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Project
+namespace Werkzeugbahnplanung
 {
     public class Bahn
     {
@@ -189,13 +189,14 @@ namespace Project
             }           
             // Verbesserung der ersten Lösung durch 2-opt
         }
-               
+        /*       
         static void Main(string[] args)
         {
             Bahn bahn = new Bahn();
             List<Voxel> voxelList = new List<Voxel>(bahn.GenerateTestData());
             bahn.Bahnplanung(voxelList);
         }
+        */
         
     }  
 }
