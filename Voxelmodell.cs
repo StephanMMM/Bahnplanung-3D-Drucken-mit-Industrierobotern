@@ -17,10 +17,10 @@ namespace Werkzeugbahnplanung
         private List<List<Voxel>> m_Schichten;
 
         //Konstruktor für Input-Funktion vorgesehen
-        public Voxelmodell(int anzahlSchichten,int infillDensity=0 ,string infillType="3DInfill",Voxel[,,] voxelmatrix, List<List<Voxel>> schichten)
+        public Voxelmodell(int anzahlSchichten,Voxel[,,] voxelmatrix, List<List<Voxel>> schichten, int infillDensity = 20, string infillType = "3DInfill")
         {
             m_AnzahlSchichten = anzahlSchichten;
-            m_Boundingbox = new Infill(infillDensity,infillType)
+            m_Boundingbox = new Infill(infillDensity, infillType);
             m_Voxelmatrix = voxelmatrix;
             m_Schichten = schichten;
         }
@@ -41,24 +41,25 @@ namespace Werkzeugbahnplanung
         /*Funktion, die eine Boundingbox eines Infill-Musters
           (derselben Größe(!)) mit dem Voxelmodell merged.
           Bounding-Box : true = Voxel gesetzt im Infill */
-        public void InsertInfill(bool[,,] boundingBox)
+        public void InsertInfill()
         {
             ushort[] koords = new ushort[3];
             //Schleifen die über alle Voxel des Modells gehen
             foreach (List<Voxel> schicht in m_Schichten)
             {
-                foreach (var voxel in schicht)
+                for (int i = 0; i < schicht.Count(); i++)
                 {
                     //Voxel die Teil des Randes sind kommen nicht in Frage
-                    if (voxel.getSchichtrand() != true) //#Question: Modellrand anstatt Schichtrand?
+                    if (schicht[i].getSchichtrand() != true) //#Question: Modellrand anstatt Schichtrand?
                     {
-                        koords = voxel.getKoords();
+                        koords = schicht[i].getKoords();
                         //Falls kein Infill an Stelle des Voxels, lösche diesen
                         //aus unserem Voxelmodell
-                        if (0 == Infill[koords[0], koords[1], koords[2]])
+                        if (0 == m_Boundingbox.IsInfill(koords[0], koords[1], koords[2]))
                         {
                             m_Voxelmatrix[koords[0], koords[1], koords[2]] = null;
-                            schicht.Remove(voxel);
+                            schicht.Remove(schicht[i]);
+                            i--;
                         }
                     }
                 }
@@ -112,7 +113,6 @@ namespace Werkzeugbahnplanung
                 hinzufügendeVoxel.Clear();
             }
         }
-
         /// <summary>
         /// Diese Methode übergibt alle existierenden Nachbarn eines existierenden Voxels
         /// </summary>
@@ -130,12 +130,15 @@ namespace Werkzeugbahnplanung
                 {
                     for (int z_div = -1; z_div <= 1; z_div++)
                     {
-                        if ((x+x_div >= 0) && (x+x_div < m_Boundingbox_x) && //liegt mit der x-Koodinate im Modell
-                            (y+y_div >= 0) && (y+y_div < m_Boundingbox_y) && //liegt mit der y-Koodinate im Modell
-                            (z+z_div >= 0) && (z+z_div < m_Boundingbox_z) && //liegt mit der z-Koodinate im Modell
-                            (m_Voxelmatrix[x, y, z] != null))//nicht null)
+                        try
                         {
-                            nachbarn.Add(m_Voxelmatrix[x+x_div, y+y_div, z+z_div]);
+                            if (a.IsNeighbor26(m_Voxelmatrix[x + x_div, y + y_div, z + z_div]))//nicht null)
+                            {
+                                nachbarn.Add(m_Voxelmatrix[x + x_div, y + y_div, z + z_div]);
+                            }
+                        }
+                        catch (IndexOutOfRangeException) {
+
                         }
                     }
                 }
