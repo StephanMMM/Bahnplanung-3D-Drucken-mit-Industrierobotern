@@ -50,7 +50,7 @@ namespace Werkzeugbahnplanung
                 for (int i = 0; i < schicht.Count(); i++)
                 {
                     //Voxel die Teil des Randes sind kommen nicht in Frage
-                    if (schicht[i].getSchichtrand() != true) //#Question: Modellrand anstatt Schichtrand?
+                    if (schicht[i].getModellrand() != true) //#Question: Modellrand anstatt Schichtrand?
                     {
                         koords = schicht[i].getKoords();
                         //Falls kein Infill an Stelle des Voxels, lösche diesen
