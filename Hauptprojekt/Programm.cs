@@ -91,6 +91,31 @@ namespace Werkzeugbahnplanung
             return null;
         }
         #endregion
+        #region Output-Methode
+        public static void output(List<Voxel> zuDruckendeVoxel)
+        {
+            Voxel vorherigerVoxel = new Voxel();
+            bool ersterVoxel = true; //flag um ersten Voxel abzuarbeiten
+            using (StreamWriter file = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "Werkzeugbahn.txt")))
+            {
+                foreach (Voxel v in zuDruckendeVoxel)
+                {
+                    if (ersterVoxel == true)
+                    {
+                        ersterVoxel = false;
+                        file.WriteLine("x y z vorher Absetzen?");
+                        file.WriteLine(v.getKoords()[0] + " " + v.getKoords()[1] + " " + v.getKoords()[2] + " " + true);
+                        vorherigerVoxel = v;
+                    }
+                    else
+                    {
+                        file.WriteLine(v.getKoords()[0] + " " + v.getKoords()[1] + " " + v.getKoords()[2] + " " + !v.IsNeighbor6(vorherigerVoxel));
+                        vorherigerVoxel = v;
+                    }
+                }
+            }
+        }
+        #endregion
        #region Tests
         /// <summary>
         /// Testet Randverbreiterung; Funktioniert nicht mit null Werten...
