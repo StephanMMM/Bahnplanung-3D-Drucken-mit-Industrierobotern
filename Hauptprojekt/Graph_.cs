@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Project
+namespace Werkzeugbahnplanung
 {
     public class Graph_
     {

@@ -10,12 +10,42 @@ namespace Werkzeugbahnplanung
     class Infill
     {
         private int[,,] infill_baseCell;
-        private int infill_density = 6;//20%
-        private int infill_offset = 3;
+        private int infill_density;
+        private int infill_offset;
+        private string infill_type;
 
         public int[,,] BaseCell { get => infill_baseCell; set => infill_baseCell = value; }
         public int Density { get => infill_density; set => infill_density = value; }
         public int Offset { get => infill_offset; set => infill_offset = value; }
+
+        public Infill(int density, string type, int offset = 0) {
+            if (density != 0)
+            {
+                infill_density = (100 / density + 1) / 2;
+                infill_density *= 2;
+                infill_baseCell = Generate_3DInfill();
+                infill_type = "Is_" + type;
+                if (type == "3DInfill")
+                {
+                    Generate_3DInfill();
+                }
+                if (type == "HexInfill")
+                {
+                    Generate_HexInfill();
+                }
+            }
+            else {
+                infill_type = "Is_Empty";
+            }
+
+        }
+
+        public int IsInfill(int x, int y=0, int z=0) {
+            //prone to errors do not change this and keep return value and parameters for Is_ Methodes equal
+            Object[] param = new Object[] { x, y, z };
+            return Int32.Parse(typeof(Infill).GetMethod(infill_type).Invoke(this, param).ToString());
+
+        }
 
         public int[,,] Generate_3DInfill()
         {
@@ -75,7 +105,7 @@ namespace Werkzeugbahnplanung
             return Sample;
         }
 
-        private int Is_3DInfill(int x, int y, int z)
+        public int Is_3DInfill(int x, int y, int z)
         {
             Boolean isEven = (0 == (y/(infill_density-1))% 2);
             y = y % (infill_density-1);
@@ -111,7 +141,7 @@ namespace Werkzeugbahnplanung
             return Sample;
         }
 
-        private int Is_HexInfill(int x, int y, int z)
+        public int Is_HexInfill(int x, int y, int z)
         {
             Boolean isEven = (0 == (x / (infill_density + (infill_density / 2) - 1)) % 2);
             y = y % (2 * infill_density - 1);
@@ -123,7 +153,7 @@ namespace Werkzeugbahnplanung
             }
             return BaseCell[x, y, 0];
         }
-        private int Is_LineInfill(int x, int y, int z)
+        public int Is_LineInfill(int x, int y, int z)
         {
             if (x % (infill_density * 2) == infill_offset || y % (infill_density * 2) == infill_offset) {
                 return 1;
@@ -131,7 +161,7 @@ namespace Werkzeugbahnplanung
             return 0;
         }
 
-        private int Is_Line3DInfill(int x, int y, int z)
+        public int Is_Line3DInfill(int x, int y, int z)
         {
             //figure out how too turn offset in ° -> 45° tilt:
             if (infill_offset != 0) {
@@ -151,6 +181,9 @@ namespace Werkzeugbahnplanung
             }
             return 0;
         }
-
+        public int Is_Empty(int x, int y, int z)
+        {
+            return 0;
+        }
     }
 }
