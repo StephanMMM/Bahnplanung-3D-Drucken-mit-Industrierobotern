@@ -43,7 +43,7 @@ namespace Werkzeugbahnplanung
                 if (Int32.TryParse(tokens[0], out boundB_x) &&
                 Int32.TryParse(tokens[1], out boundB_y) &&
                 Int32.TryParse(tokens[2], out boundB_z) &&
-                Int32.TryParse(tokens[3], out anzSchichten))
+                Int32.TryParse(tokens[3], out anzSchichten) )
                 {
                     readfirstline = true; //Es werden keine weiteren Zeilen probiert
                     //Erstelle für jede Schicht eine eigene Liste
@@ -58,6 +58,7 @@ namespace Werkzeugbahnplanung
                     {
                         string[] voxelparam = lines[i].Split(' ');
                         ushort[] voxelKoords = new ushort[3];
+                        float[] voxelOrientierung = new float[3];
                         int schicht = 0;
                         //Für die Anzeige im Gnuplot werden werden ushorts benötigt. Diese können ohne Probleme später in booleans umgewandelt werden
                         ushort schichtrand = 0, modellrand = 0;
@@ -67,11 +68,14 @@ namespace Werkzeugbahnplanung
                             ushort.TryParse(voxelparam[2], out voxelKoords[2]) &&
                             ushort.TryParse(voxelparam[3], out schichtrand) &&
                             ushort.TryParse(voxelparam[4], out modellrand) &&
-                            Int32.TryParse(voxelparam[5], out schicht))
+                            Int32.TryParse(voxelparam[5], out schicht) &&
+                            float.TryParse(voxelparam[6], CultureInfo.InvariantCulture, out voxelOrientierung[0]) &&
+                            float.TryParse(voxelparam[7], CultureInfo.InvariantCulture, out voxelOrientierung[1]) &&
+                            float.TryParse(voxelparam[8], CultureInfo.InvariantCulture, out voxelOrientierung[2]))
                         {
                             //Erstelle anhand der Werte einen neuen Voxel in der Matrix 
                             //und in der entsprechenden Schicht
-                            voxelmatrix[voxelKoords[0], voxelKoords[1], voxelKoords[2]] = new Voxel(Convert.ToBoolean(schichtrand),Convert.ToBoolean(modellrand), voxelKoords[0], voxelKoords[1], voxelKoords[2]);
+                            voxelmatrix[voxelKoords[0], voxelKoords[1], voxelKoords[2]] = new Voxel(Convert.ToBoolean(schichtrand), Convert.ToBoolean(modellrand), voxelKoords[0], voxelKoords[1], voxelKoords[2], voxelOrientierung[0], voxelOrientierung[1], voxelOrientierung[2]);
                             schichten[schicht].Add(voxelmatrix[voxelKoords[0], voxelKoords[1], voxelKoords[2]]);
                         }
                         else
