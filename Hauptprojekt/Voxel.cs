@@ -2,7 +2,7 @@
 
 namespace Werkzeugbahnplanung
 {
-    public class Voxel
+   public class Voxel
     {
         private bool m_Schichtrand;
         private bool m_Modellrand;
@@ -23,6 +23,13 @@ namespace Werkzeugbahnplanung
             m_koordinaten[0] = xKoord;
             m_koordinaten[1] = yKoord;
             m_koordinaten[2] = zKoord;
+        }
+
+        public Voxel(ushort[] koordinaten)
+        {
+            m_Schichtrand = false;
+            m_Modellrand = false;
+            m_koordinaten = koordinaten;
         }
 
         public void setSchichtrand(bool value)
@@ -53,10 +60,6 @@ namespace Werkzeugbahnplanung
         //Prüfe ob zwei Voxel benachbart sind
         public bool IsNeighbor26(Voxel a)
         {
-            /*
-             Zwei Voxel sind benachbart, wenn ihre einzelnen Koordinatendistanzen <=1 sind
-             d.h alle 26 Nachbarn gelten als Nachbarn. Ein Voxel ist zu sich selbst nicht benachbart.
-             */
             int[] distanz = this.VoxelKoordinatenDistanz(a);
             int distanzSumme = distanz[0] + distanz[1] + distanz[2];
             if ((distanz[0] <= 1 && distanz[1] <= 1 && distanz[2] <= 1)&&(distanzSumme != 0))
