@@ -26,7 +26,7 @@ namespace Werkzeugbahnplanung
                 {
                     Generate_3DInfill();
                 }
-                if (type == "HexInfill")
+                else if (type == "HexInfill")
                 {
                     Generate_HexInfill();
                 }
