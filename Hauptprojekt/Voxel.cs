@@ -7,12 +7,14 @@ namespace Werkzeugbahnplanung
         private bool m_Schichtrand;
         private bool m_Modellrand;
         private ushort[] m_koordinaten;
+        private ushort[] m_orientierung;
 
         public Voxel()
         {
             m_Schichtrand = false;
             m_Modellrand = false;
             m_koordinaten = new ushort[3]{0,0,0};
+            m_orientierung = new ushort[3]{0,0,0};
         }
 
         public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord)
@@ -23,6 +25,20 @@ namespace Werkzeugbahnplanung
             m_koordinaten[0] = xKoord;
             m_koordinaten[1] = yKoord;
             m_koordinaten[2] = zKoord;
+            m_orienntierung = new ushort[3]{0,0,0};
+        }
+      
+         public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord, ushort xOrient, ushort yOrient, ushort zOrient )
+        {
+            m_Schichtrand = schichtrand;
+            m_Modellrand = modellrand;
+            m_koordinaten = new ushort[3];
+            m_koordinaten[0] = xKoord;
+            m_koordinaten[1] = yKoord;
+            m_koordinaten[2] = zKoord;
+            m_orientierung[0] = xOrient;
+            m_orientierung[1] = yOrient;
+            m_orientierung[2] = zOrient;
         }
 
         public Voxel(ushort[] koordinaten)
