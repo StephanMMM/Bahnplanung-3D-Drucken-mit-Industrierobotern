@@ -7,14 +7,14 @@ namespace Werkzeugbahnplanung
         private bool m_Schichtrand;
         private bool m_Modellrand;
         private ushort[] m_koordinaten;
-        private ushort[] m_orientierung;
+        private float[] m_orientierung;
 
         public Voxel()
         {
             m_Schichtrand = false;
             m_Modellrand = false;
             m_koordinaten = new ushort[3]{0,0,0};
-            m_orientierung = new ushort[3]{0,0,0};
+            m_orientierung = new float[3]{0.0,0.0,0.0};
         }
 
         public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord)
@@ -25,10 +25,10 @@ namespace Werkzeugbahnplanung
             m_koordinaten[0] = xKoord;
             m_koordinaten[1] = yKoord;
             m_koordinaten[2] = zKoord;
-            m_orientierung = new ushort[3]{0,0,0};
+            m_orientierung = new float[3]{0.0,0.0,0.0};
         }
       
-         public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord, ushort xOrient, ushort yOrient, ushort zOrient )
+         public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord, float xOrient, float yOrient, float zOrient )
         {
             m_Schichtrand = schichtrand;
             m_Modellrand = modellrand;
@@ -72,6 +72,10 @@ namespace Werkzeugbahnplanung
         {
             return m_koordinaten;
         }
+      
+         public float[] getOrientierung() {
+            return m_orientierung;
+         }
         
         //Prüfe ob zwei Voxel benachbart sind
         public bool IsNeighbor26(Voxel a)
