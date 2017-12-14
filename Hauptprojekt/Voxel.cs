@@ -25,7 +25,7 @@ namespace Werkzeugbahnplanung
             m_koordinaten[0] = xKoord;
             m_koordinaten[1] = yKoord;
             m_koordinaten[2] = zKoord;
-            m_orienntierung = new ushort[3]{0,0,0};
+            m_orientierung = new ushort[3]{0,0,0};
         }
       
          public Voxel(bool schichtrand, bool modellrand, ushort xKoord, ushort yKoord, ushort zKoord, ushort xOrient, ushort yOrient, ushort zOrient )
