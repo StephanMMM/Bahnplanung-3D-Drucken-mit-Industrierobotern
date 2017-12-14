@@ -21,6 +21,7 @@ namespace Werkzeugbahnplanung
                 infill_density *= 2;
                 infill_baseCell = Generate_3DInfill();
                 infill_type = "Is_" + type;
+                infill_offset = offset;
                 if (type == "3DInfill")
                 {
                     Generate_3DInfill();
